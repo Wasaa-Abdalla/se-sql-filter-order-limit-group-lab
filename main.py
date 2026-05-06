@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import sqlite3
 
 ##### Part I: Basic Filtering #####
@@ -13,7 +14,7 @@ pd.read_sql("""SELECT * FROM planets; """, conn1)
 df_no_moons = pd.read_sql("""
 SELECT *
 FROM planets
-WHERE moons = 0;
+WHERE num_of_moons = 0;
 """, conn1)
 
 # STEP 2: Planets with names of exactly 7 letters
@@ -36,7 +37,7 @@ WHERE mass <= 1.00;
 df_mass_moon = pd.read_sql("""
 SELECT *
 FROM planets
-WHERE moons >= 1 AND mass < 1.00;
+WHERE num_of_moons >= 1 AND mass < 1.00;
 """, conn1)
 
 # STEP 5: Planets with color containing "blue"
@@ -61,6 +62,7 @@ FROM dogs
 WHERE hungry = 1
 ORDER BY age ASC;
 """, conn2)
+df_hungry = df_hungry.where(pd.notnull(df_hungry), None)  # Fix NaN → None
 
 # STEP 7: Hungry dogs age 2–7, sorted alphabetically by name
 df_hungry_ages = pd.read_sql("""
@@ -69,6 +71,7 @@ FROM dogs
 WHERE hungry = 1 AND age BETWEEN 2 AND 7
 ORDER BY name ASC;
 """, conn2)
+df_hungry_ages = df_hungry_ages.where(pd.notnull(df_hungry_ages), None)
 
 # STEP 8: 4 oldest dogs, sorted alphabetically by breed
 df_4_oldest = pd.read_sql("""
@@ -81,6 +84,7 @@ FROM (
 )
 ORDER BY breed ASC;
 """, conn2)
+df_4_oldest = df_4_oldest.where(pd.notnull(df_4_oldest), None)
 
 ##### Part 4: Aggregation #####
 
@@ -98,11 +102,9 @@ FROM babe_ruth_stats;
 
 # STEP 10: Total home runs
 df_hr_total = pd.read_sql("""
-SELECT SUM(home_runs) AS total_home_runs
+SELECT SUM(HR) AS total_home_runs
 FROM babe_ruth_stats;
 """, conn3)
-
-##### Part 5: Grouping and Aggregation #####
 
 # STEP 11: Number of years played per team
 df_teams_years = pd.read_sql("""
